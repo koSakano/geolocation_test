@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  node:
+    build: ./docker/node
+    tty: true
+    volumes:
+      - ./:/var/www/geolocation
+    working_dir: /var/www/geolocation
+    ports:
+      - 3000:3000
+
+  nginx:
+    build: ./docker/nginx
+    ports:
+      - 4000:4000
+    environment:
+      - TZ=Asia/Tokyo
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./dist:/www:ro
