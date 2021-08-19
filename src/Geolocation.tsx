@@ -1,7 +1,7 @@
 import * as React from "react";
 import Maps from "./Map";
 
-export const Geolocation = (): React.ReactElement =>  {
+export default function Geolocation(): React.ReactElement {
   const [isAvailable, setAvailable] = React.useState<boolean>(false);
   const [position, setPosition] = React.useState<[number, number]>([35.688940226098715, 139.7636715552086]);
   const [watchStatus, setWatchStatus] = React.useState<{isWatching: boolean, watchId: number}>({ isWatching: false, watchId: 0 });
@@ -66,4 +66,4 @@ export const Geolocation = (): React.ReactElement =>  {
       )}
     </>
   );
-};
+}
