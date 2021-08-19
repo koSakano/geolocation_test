@@ -1,8 +1,9 @@
 import * as React from "react";
+import Maps from "./Map";
 
 export const Geolocation = (): React.ReactElement =>  {
   const [isAvailable, setAvailable] = React.useState<boolean>(false);
-  const [position, setPosition] = React.useState<{lat: number|null, lng: number | null}>({ lat: null, lng: null });
+  const [position, setPosition] = React.useState<{lat: number, lng: number}>({ lat: 35.688940226098715, lng: 139.7636715552086 });
   const [watchStatus, setWatchStatus] = React.useState<{isWatching: boolean, watchId: number}>({ isWatching: false, watchId: 0 });
 
   React.useEffect(() => {
@@ -36,7 +37,7 @@ export const Geolocation = (): React.ReactElement =>  {
 
   return (
     <>
-      <p>Geolocation API Sample</p>
+      {/* <p>Geolocation API Sample</p> */}
       {isAvailable && (
         <div>
           <button onClick={getCurrentPosition}>現在地取得</button>
@@ -60,6 +61,7 @@ export const Geolocation = (): React.ReactElement =>  {
             <p>Watch Status: {watchStatus.isWatching ? "追跡中" : "追跡中止"}</p>
             <p>Watch ID: {watchStatus.watchId}</p>
           </div>
+          <Maps position={position} />
         </div>
       )}
     </>
