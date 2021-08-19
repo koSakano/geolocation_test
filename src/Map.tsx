@@ -9,6 +9,23 @@ interface IProps {
   position: [number, number];
 }
 
+function MakeOperationConvenience() {
+  const map = useMapEvent("click", (e) => {
+    map.setView(e.latlng, map.getZoom(), {
+      animate: true,
+    });
+  });
+
+  return null;
+}
+
+function SetCenterPosition({ coords }) {
+  const map = useMap();
+  map.setView(coords, map.getZoom());
+
+  return null;
+}
+
 export default function Maps(props: IProps): React.ReactElement {
   React.useEffect(() => {
     const DefaultIcon = Leaflet.icon({
@@ -17,23 +34,6 @@ export default function Maps(props: IProps): React.ReactElement {
     });
     Leaflet.Marker.prototype.options.icon = DefaultIcon;
   }, []);
-
-  const MakeOperationConvenience = () => {
-    const map = useMapEvent("click", (e) => {
-      map.setView(e.latlng, map.getZoom(), {
-        animate: true,
-      });
-    });
-
-    return null;
-  };
-
-  const SetCenterPosition = ({ coords }) => {
-    const map = useMap();
-    map.setView(coords, map.getZoom());
-
-    return null;
-  };
 
   return (
     <MapContainer center={props.position} zoom={16} scrollWheelZoom={false} style={{ height: "100vh", width: "100%" }}>
