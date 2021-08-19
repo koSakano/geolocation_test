@@ -3,7 +3,7 @@ import Maps from "./Map";
 
 export const Geolocation = (): React.ReactElement =>  {
   const [isAvailable, setAvailable] = React.useState<boolean>(false);
-  const [position, setPosition] = React.useState<{lat: number, lng: number}>({ lat: 35.688940226098715, lng: 139.7636715552086 });
+  const [position, setPosition] = React.useState<[number, number]>([35.688940226098715, 139.7636715552086]);
   const [watchStatus, setWatchStatus] = React.useState<{isWatching: boolean, watchId: number}>({ isWatching: false, watchId: 0 });
 
   React.useEffect(() => {
@@ -16,7 +16,7 @@ export const Geolocation = (): React.ReactElement =>  {
   const getCurrentPosition = () => {
     navigator.geolocation.getCurrentPosition(position => {
       const { latitude, longitude } = position.coords;
-      setPosition({ lat: latitude, lng: longitude });
+      setPosition([latitude, longitude]);
     });
   };
 
@@ -24,7 +24,7 @@ export const Geolocation = (): React.ReactElement =>  {
   const startWatchPosition = () => {
     const watchId = navigator.geolocation.watchPosition(position => {
       const { latitude, longitude } = position.coords;
-      setPosition({ lat: latitude, lng: longitude });
+      setPosition([latitude, longitude]);
     });
     setWatchStatus({ isWatching: true, watchId});
   };
@@ -51,9 +51,9 @@ export const Geolocation = (): React.ReactElement =>  {
           <div>
             <h3>Position</h3>
             <div>
-              latitude: {position.lat}
+              latitude: {position[0]}
               <br />
-              longitude: {position.lng}
+              longitude: {position[1]}
             </div>
           </div>
           <div>
