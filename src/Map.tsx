@@ -4,6 +4,7 @@ import Leaflet from "leaflet/dist/leaflet-src.js";
 import { MapContainer, Marker, TileLayer, Popup, useMap, useMapEvent, CircleMarker, Tooltip } from "react-leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import { tooltip } from "leaflet";
 
 interface IProps {
   position: [number, number];
@@ -45,11 +46,14 @@ export default function Maps(props: IProps): React.ReactElement {
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={props.position}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
+      <CircleMarker
+        center={props.position}
+        radius={50}
+      >
+        <Tooltip>
+          現在地
+        </Tooltip>
+      </CircleMarker>
     </MapContainer>
   );
 }
