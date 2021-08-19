@@ -1,10 +1,9 @@
 import * as React from "react";
 import "leaflet/dist/leaflet.css";
 import Leaflet from "leaflet/dist/leaflet-src.js";
-import { MapContainer, Marker, TileLayer, Popup, useMap, useMapEvent, CircleMarker, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, useMap, useMapEvent, CircleMarker, Tooltip } from "react-leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import { tooltip } from "leaflet";
 
 interface IProps {
   position: [number, number];
