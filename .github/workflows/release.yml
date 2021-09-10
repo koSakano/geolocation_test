@@ -1,0 +1,25 @@
+name: Create Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - release_note
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@main
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event.pull_request.title }}
+        release_name: ${{ github.event.pull_request.title }}
+        body: ${{ github.event.pull_request.title }}
+        draft: $${{ github.event.pull_request.title }}
+        prerelease: false
