@@ -1,0 +1,81 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - release_note
+
+jobs:
+  create_release_pr:
+    if: (github.ref == 'refs/heads/main')
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Create release pr if does not exist
+        if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr list --label "Production Release" | grep "main" || gh pr create --base release_note --title "Production Release $(date '+%Y-%m-%d' --date 'next monday')" --body "" --label "Production Release"
+
+      - name: Set environment variables
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "CAN_EDIT_PR_BODY=$(date '+%A' | grep -e 'Tuesday' -e 'Wednesday' -e 'Thursday')" >> $GITHUB_ENV
+          echo "BASE_PR_URL=https://github.com/sen-corporation/hoisys/pull/" >> $GITHUB_ENV
+
+      - name: Update production release branch body
+        if: github.ref == 'refs/heads/main' && env.CAN_EDIT_PR_BODY
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MERGED_LIST=$(git log \
+                  --merges origin/release_note..origin/main \
+                  --first-parent \
+                  --reverse \
+                  --date=iso \
+                  --pretty="%ad %an %s %b")
+          FEATURE_LIST=$(echo -e "$MERGED_LIST" | grep \/feature\/ | awk -F ' ' '{ message = ""; for (i = 11; i <= NF; i++) { message = message $i } print "- [ ] [[" $1 " " $2 "] " message " by " $4 "](${{ env.BASE_PR_URL }}" $8 ")" }' | sed -e 's/#//')
+          REFACTOR_LIST=$(echo -e "$MERGED_LIST" | grep \/refactor\/ | awk -F ' ' '{ message = ""; for (i = 11; i <= NF; i++) { message = message $i } print "- [ ] [[" $1 " " $2 "] " message " by " $4 "](${{ env.BASE_PR_URL }}" $8 ")" }' | sed -e 's/#//')
+          FIX_LIST=$(echo -e "$MERGED_LIST" | grep \/fix\/ | awk -F ' ' '{ message = ""; for (i = 11; i <= NF; i++) { message = message $i } print "- [ ] [[" $1 " " $2 "] " message " by " $4 "](${{ env.BASE_PR_URL }}" $8 ")" }' | sed -e 's/#//')
+          OTHER_LIST=$(echo -e "$MERGED_LIST" | grep -v -e \/feature\/ -e \/refactor\/ -e \/fix\/ | awk -F ' ' '{ message = ""; for (i = 11; i <= NF; i++) { message = message $i } print "- [ ] [[" $1 " " $2 "] " message " by " $4 "](${{ env.BASE_PR_URL }}" $8 ")" }' | sed -e 's/#//')
+
+          gh pr edit main --body "
+          # リリース内容
+          ### ※ 動作確認は金曜~月曜にしてください
+
+          ## 新機能
+          $FEATURE_LIST
+
+          ## 改善
+          $REFACTOR_LIST
+
+          ## バグ修正
+          $FIX_LIST
+
+          ## その他
+          $OTHER_LIST"
+
+      - name: Checkout base branch
+        if: github.ref == 'refs/heads/main' && !(env.CAN_EDIT_PR_BODY)
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      - name: Comment to release branch
+        if: github.ref == 'refs/heads/main' && !(env.CAN_EDIT_PR_BODY)
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment main --body "
+          以下のプルリクエストは、対象期間外にmainへマージされました。
+          ※ 金曜~月曜は、mainブランチにマージされている内容を修正するプルリクエストであればマージ可能です。
+          $(
+            git log -n 1 \
+              --date=iso \
+              --pretty="%ad %an %s %b" \
+              | awk -F ' ' '{ message = ""; for (i = 11; i <= NF; i++) { message = message $i } print "- [ ] [[" $1 " " $2 "] " message " by " $4 "](${{ env.BASE_PR_URL }}" $8 ")" }' \
+              | sed -e 's/#//'
+          )"
