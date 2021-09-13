@@ -36,7 +36,7 @@ export default function Maps(props: IProps): React.ReactElement {
   }, []);
 
   return (
-    <MapContainer center={props.position} zoom={16} scrollWheelZoom={false} style={{ height: "100vh", width: "100%" }}>
+    <MapContainer center={props.position} zoom={16} scrollWheelZoom={false} style={{ height: "80vh", width: "80%" }}>
       <MakeOperationConvenience />
       <SetCenterPosition
         coords={props.position}
